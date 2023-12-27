@@ -2,3 +2,5 @@
 /bounding_box_training_images/
 /cropped_images
 model.pkl
+/haarcascade_frontalface_default.xml
+/.idea/

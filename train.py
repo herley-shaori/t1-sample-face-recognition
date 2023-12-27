@@ -13,7 +13,6 @@ X_train = []
 y_train = []
 for filename in os.listdir(cropped_images_folder):
     img = cv2.imread(os.path.join(cropped_images_folder, filename))
-    print(len(img.flatten()))
     X_train.append(img.flatten())  # Flatten for classification
     y_train.append(filename.split("_")[0])  # Assuming label is in filename
 
@@ -45,7 +44,3 @@ for model in [svm_model,nb_model]:
     if(currentF1Score is None or f1 > currentF1Score):
         currentF1Score = f1
         joblib.dump(model, "model.pkl")
-    # if(f1_score is None or f1 > f1_score):
-    #     f1_score = f1
-    #     best_model = model
-    #     joblib.dump(best_model, "model.pkl")
