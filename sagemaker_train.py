@@ -19,7 +19,7 @@ role = sagemaker.get_execution_role()
 
 # Create SKLearn estimator
 estimator = SKLearn(
-    entry_point="train.py",  # Script containing model training code
+    entry_point="local_train.py",  # Script containing model training code
     source_dir=".",
     role=role,
     instance_count=1,
