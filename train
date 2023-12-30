@@ -93,6 +93,8 @@ def train():
             # Save the best model.
             if (currentF1Score is None or f1 > currentF1Score):
                 currentF1Score = f1
+                with open(os.path.join(model_path, 'model.pkl'), 'wb') as out:
+                    pickle.dump(model, out)
                 with open(os.path.join('model.pkl'), 'wb') as out:
                     pickle.dump(model, out)
                 s3 = boto3.client('s3')
