@@ -2,6 +2,7 @@ import joblib
 import os
 import numpy as np
 import cv2
+import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB
@@ -22,6 +23,27 @@ X_train_padded = [np.pad(img, ((0, max_shape[0] - img.shape[0])), mode='constant
 
 # Split into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X_train_padded, y_train, test_size=0.2, random_state=42)
+
+# Create DataFrames from NumPy arrays:
+X_train_df = pd.DataFrame(X_train)
+X_test_df = pd.DataFrame(X_test)
+y_train_df = pd.DataFrame(y_train)
+y_test_df = pd.DataFrame(y_test)
+
+# Automate feature names:
+num_features = 56307
+X_train_df.columns = [f'feature_{i}' for i in range(num_features)]
+X_test_df.columns = X_train_df.columns  # Use the same column names for consistency
+
+# Set target variable name:
+y_train_df.columns = ['target']
+y_test_df.columns = y_train_df.columns
+
+# Add y_train as the first column of X_train_df:
+X_train_df = pd.concat([y_train_df, X_train_df], axis=1)
+
+X_train_df.to_csv('train.csv',index=False)
+
 
 # Train SVM and Naive Bayes models
 svm_model = SVC().fit(X_train, y_train)
@@ -44,3 +66,5 @@ for model in [svm_model,nb_model]:
     if(currentF1Score is None or f1 > currentF1Score):
         currentF1Score = f1
         joblib.dump(model, "model.pkl")
+
+print(y_test)
