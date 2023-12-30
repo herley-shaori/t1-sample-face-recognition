@@ -34,6 +34,7 @@ RUN pip install --only-binary opencv-python-headless opencv-python-headless
 # PATH so that the train and serve programs are found when the container is invoked.
 COPY . /opt/program
 WORKDIR /opt/program
+RUN mkdir inference_input
 RUN pip install -r requirements.txt
 
 ENV PYTHONUNBUFFERED=TRUE
