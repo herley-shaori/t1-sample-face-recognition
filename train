@@ -6,15 +6,10 @@
 
 from __future__ import print_function
 
-import json
-import os
 import pickle
 import sys
 import traceback
-import pandas as pd
-from sklearn import tree
-
-import joblib
+import boto3
 import os
 import numpy as np
 import cv2
@@ -98,8 +93,10 @@ def train():
             # Save the best model.
             if (currentF1Score is None or f1 > currentF1Score):
                 currentF1Score = f1
-                with open(os.path.join(model_path, 'best-model.pkl'), 'wb') as out:
+                with open(os.path.join('model.pkl'), 'wb') as out:
                     pickle.dump(model, out)
+                s3 = boto3.client('s3')
+                s3.upload_file('model.pkl', 'temp-data-for-rekognition', 'byom-model/model.pkl')
     except Exception as e:
         # Write out an error file. This will be returned as the failureReason in the
         # DescribeTrainingJob result.
@@ -113,6 +110,5 @@ def train():
 
 if __name__ == '__main__':
     train()
-
     # A zero exit code causes the job to be marked a Succeeded.
     sys.exit(0)

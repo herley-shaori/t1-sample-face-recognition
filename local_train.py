@@ -1,8 +1,9 @@
-import joblib
 import os
 import numpy as np
 import cv2
 import pandas as pd
+import boto3
+import pickle
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB
@@ -65,6 +66,7 @@ for model in [svm_model,nb_model]:
     # Save the best model.
     if(currentF1Score is None or f1 > currentF1Score):
         currentF1Score = f1
-        joblib.dump(model, "model.pkl")
-
-print(y_test)
+        with open(os.path.join('model.pkl'), 'wb') as out:
+            pickle.dump(model, out)
+        s3 = boto3.client('s3')
+        s3.upload_file('model.pkl', 'temp-data-for-rekognition', 'byom-model/model.pkl')
