@@ -41,7 +41,7 @@ def train():
         # Load cropped images and labels (assuming labels are in filenames)
         X_train = []
         y_train = []
-        for filename in os.listdir(cropped_images_folder):
+        for filename in os.listdir(input_path):
             img = cv2.imread(os.path.join(cropped_images_folder, filename))
             X_train.append(img.flatten())  # Flatten for classification
             y_train.append(filename.split("_")[0])  # Assuming label is in filename

@@ -2,17 +2,24 @@
 # This is a Python 3 image that uses the nginx, gunicorn, flask stack
 # for serving inferences in a stable way.
 
-FROM ubuntu:18.04
+FROM ubuntu:22.04
 
 MAINTAINER Amazon AI <sage-learner@amazon.com>
 
-RUN apt-get -y update
+RUN apt-get update &&\
+    DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
+RUN #apt-get -y update
 RUN apt install software-properties-common -y
+RUN add-apt-repository ppa:deadsnakes/ppa
+#RUN apt-get -y update
+RUN apt install python3.12 -y
 RUN apt install curl -y
+RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.12
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 2
+
 RUN apt-get -y update && apt-get install -y --no-install-recommends \
          wget \
-         python3-pip \
-         python3-setuptools \
          nginx \
          ca-certificates \
     && rm -rf /var/lib/apt/lists/*
@@ -21,21 +28,11 @@ RUN ln -s /usr/bin/pip3 /usr/bin/pip
 RUN apt-get update -y
 RUN apt install -y dos2unix
 RUN pip install --only-binary opencv-python-headless opencv-python-headless
-# Here we get all python packages.
-# There's substantial overlap between scipy and numpy that we eliminate by
-# linking them together. Likewise, pip leaves the install caches populated which uses
-# a significant amount of space. These optimizations save a fair amount of space in the
-# image, which reduces start up time.
-#RUN pip --no-cache-dir install numpy==1.16.2 scipy==1.2.1 scikit-learn==0.20.2 pandas flask gunicorn
 
-# Set some environment variables. PYTHONUNBUFFERED keeps Python from buffering our standard
-# output stream, which means that logs can be delivered to the user quickly. PYTHONDONTWRITEBYTECODE
-# keeps Python from writing the .pyc files which are unnecessary in this case. We also update
-# PATH so that the train and serve programs are found when the container is invoked.
 COPY . /opt/program
 WORKDIR /opt/program
-RUN mkdir inference_input
-RUN pip install -r requirements.txt
+RUN mkdir -p inference_input
+RUN pip install  --ignore-installed  -r requirements.txt
 
 ENV PYTHONUNBUFFERED=TRUE
 ENV PYTHONDONTWRITEBYTECODE=TRUE
