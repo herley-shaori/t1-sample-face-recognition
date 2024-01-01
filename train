@@ -36,12 +36,15 @@ training_path = os.path.join(input_path, channel_name)
 # The function to execute the training.
 def train():
     try:
-        print('Starting the training.')
+        print('Starting load data.')
+        os.system('aws s3 cp s3://temp-data-for-rekognition/cropped_images_all/ %s/ --recursive'%(input_path))
+        os.system('aws s3 cp s3://temp-data-for-rekognition/cropped_images_all/ cropped_images/ --recursive')
         cropped_images_folder = 'cropped_images'
+        print('Done load data.')
         # Load cropped images and labels (assuming labels are in filenames)
         X_train = []
         y_train = []
-        for filename in os.listdir(input_path):
+        for filename in os.listdir(cropped_images_folder):
             img = cv2.imread(os.path.join(cropped_images_folder, filename))
             X_train.append(img.flatten())  # Flatten for classification
             y_train.append(filename.split("_")[0])  # Assuming label is in filename
@@ -50,7 +53,6 @@ def train():
         max_shape = (max([img.shape[0] for img in X_train]),)
         X_train_padded = [np.pad(img, ((0, max_shape[0] - img.shape[0])), mode='constant') for img in X_train]
 
-        # Split into training and testing sets
         X_train, X_test, y_train, y_test = train_test_split(X_train_padded, y_train, test_size=0.2, random_state=42)
 
         # Create DataFrames from NumPy arrays:
