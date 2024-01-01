@@ -16,9 +16,7 @@ for filename in os.listdir(train_folder):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     faces = face_cascade.detectMultiScale(gray, 1.3, 5)
     for (x, y, w, h) in faces:
-        print(filename)
         cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)  # Blue bounding box
         cv2.imwrite(os.path.join(bounding_box_folder, filename), img)
-
         cropped_img = img[y:y+h, x:x+w]
         cv2.imwrite(os.path.join(cropped_images_folder, filename), cropped_img)
